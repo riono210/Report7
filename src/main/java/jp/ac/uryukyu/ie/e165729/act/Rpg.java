@@ -9,7 +9,7 @@ import javax.swing.JFrame;
  */
 public class Rpg extends JFrame{
     public Rpg(){
-        setTitle("お城を建てる");
+        setTitle("勇者は1歩を踏み出した!");
 
         MainPanel panel = new MainPanel();
         Container contentPane = getContentPane();
