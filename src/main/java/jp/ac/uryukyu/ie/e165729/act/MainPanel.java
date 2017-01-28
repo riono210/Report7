@@ -15,67 +15,37 @@ import javax.swing.JPanel;
  */
 public class MainPanel extends JPanel implements KeyListener, Common{
     // ウィンドウの大きさ
-    private static final int width = 480;
+    private static final int width = 640;
     private static final int height = 480;
 
-    // 行と列の大きさ(ピクセル)
-    private static final int row = 15;
-    private static final int col = 15;
+    private Map map;
 
-    // チップセットのサイズ(ピクセル)
-    private static final int cs = 32;
+    private Chara hero;
 
-    // マップ: 0=床，1=壁
-    private int [][] map = {
-            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,1,1,1,1,1,0,0,0,0,1},
-            {1,0,0,0,0,1,0,0,0,1,0,0,0,0,1},
-            {1,0,0,0,0,1,0,0,0,1,0,0,0,0,1},
-            {1,0,0,0,0,1,0,0,0,1,0,0,0,0,1},
-            {1,0,0,0,0,1,1,0,1,1,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}};
-
-    //　チップセット
-    private Image floorImage;
-    private Image wallImage;
-    private Image heroImage;
-
-    // 勇者の座標
-    private int x, y;
-
+    private MainPanel panel;
 
     public MainPanel(){
         // パネルの推奨サイズの設定
         setPreferredSize(new Dimension(width,height));
 
-        // イメージをロード
-        loadImage();
-
-        // 勇者の位置の初期化
-        x = 1;
-        y = 1;
-
         // キー入力を受付
         setFocusable(true);
         addKeyListener(this);
+
+        map = new Map(this);
+
+        hero = new Chara(1, 1, "/Users/e165729/IdeaProjects/Report7/src/main/java/jp/ac/uryukyu/ie/e165729/image/Hero.png", map, this);
+
     }
 
     public void paintComponent(Graphics g){
         super.paintComponent(g);
 
         // マップを描く
-        drawMap(g);
+        map.draw(g);
 
         // 勇者を描く
-        drawChara(g);
+        hero.draw(g);
     }
 
     public void keyPressed(KeyEvent e){
@@ -85,22 +55,22 @@ public class MainPanel extends JPanel implements KeyListener, Common{
         switch (keyCode){
             case KeyEvent.VK_LEFT :
                 // 左キーの場合は勇者を１歩左へ
-                move(left);
+                hero.move(left);
                 break;
 
             case KeyEvent.VK_RIGHT :
                 // 右キーの場合は勇者を１歩右へ
-                move(right);
+                hero.move(right);
                 break;
 
             case KeyEvent.VK_UP :
                 // 上キーの場合は勇者を１歩上へ
-                move(up);
+                hero.move(up);
                 break;
 
             case  KeyEvent.VK_DOWN :
                 // 下キーの場合は勇者を１歩下へ
-                move(down);
+                hero.move(down);
                 break;
         }
 
@@ -114,66 +84,4 @@ public class MainPanel extends JPanel implements KeyListener, Common{
     public void keyTyped(KeyEvent e){
     }
 
-    private boolean isHit(int x, int y){
-        // (x,y)に壁があったら進まない
-        if(map[y][x] == 1){
-            return true;
-        }
-
-        // なければ進む
-        return false;
-    }
-
-    private void move(int dir){
-        // dirの方向でぶつからなければ移動する
-        switch (dir){
-            case left :
-                if(! isHit(x-1, y)) x--;
-                break;
-
-            case right :
-                if(! isHit(x+1, y)) x++;
-                break;
-
-            case up :
-                if(! isHit(x, y-1)) y--;
-                break;
-
-            case down :
-                if(! isHit(x, y+1)) y++;
-                break;
-        }
-    }
-
-    private  void loadImage(){
-        ImageIcon icon = new ImageIcon("/Users/e165729/IdeaProjects/Report7/src/main/java/jp/ac/uryukyu/ie/e165729/image/hero.gif");
-        heroImage = icon.getImage();
-
-        icon = new ImageIcon("/Users/e165729/IdeaProjects/Report7/src/main/java/jp/ac/uryukyu/ie/e165729/image/floor.gif");
-        floorImage = icon.getImage();
-
-        icon = new ImageIcon("/Users/e165729/IdeaProjects/Report7/src/main/java/jp/ac/uryukyu/ie/e165729/image/wall.gif");
-        wallImage = icon.getImage();
-    }
-
-    private void drawChara(Graphics g){
-        g.drawImage(heroImage, x*cs, y*cs, this);
-    }
-
-    private void drawMap(Graphics g){
-        for(int i = 0; i < row; i++){
-            for(int j = 0; j < col; j++){
-                // mapの値に応じて絵を描く
-                switch (map[i][j]){
-                    case 0: // 床
-                        g.drawImage(floorImage, j*cs, i*cs, this);
-                        break;
-
-                    case 1: // 壁
-                        g.drawImage(wallImage, j*cs, i*cs, this);
-                        break;
-                }
-            }
-        }
-    }
 }
