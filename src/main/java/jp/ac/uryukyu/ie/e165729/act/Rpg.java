@@ -1,6 +1,6 @@
 package jp.ac.uryukyu.ie.e165729.act;
 
-import java.awt.Container;
+import java.awt.*;
 
 import javax.swing.JFrame;
 
@@ -9,12 +9,13 @@ import javax.swing.JFrame;
  */
 public class Rpg extends JFrame{
     public Rpg(){
-        setTitle("勇者降臨");
+        setTitle("お城を建てる");
 
         MainPanel panel = new MainPanel();
         Container contentPane = getContentPane();
         contentPane.add(panel);
 
+        //　パネルサイズに合わせてフレームサイズを自動設定
         pack();
     }
 
