@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 /**
  * Created by e165729 on 2017/01/24.
  */
-public class MainPanel extends JPanel implements KeyListener{
+public class MainPanel extends JPanel implements KeyListener, Common{
     // ウィンドウの大きさ
     private static final int width = 480;
     private static final int height = 480;
@@ -85,22 +85,22 @@ public class MainPanel extends JPanel implements KeyListener{
         switch (keyCode){
             case KeyEvent.VK_LEFT :
                 // 左キーの場合は勇者を１歩左へ
-                x--;
+                move(left);
                 break;
 
             case KeyEvent.VK_RIGHT :
                 // 右キーの場合は勇者を１歩右へ
-                x++;
+                move(right);
                 break;
 
             case KeyEvent.VK_UP :
                 // 上キーの場合は勇者を１歩上へ
-                y--;
+                move(up);
                 break;
 
             case  KeyEvent.VK_DOWN :
                 // 下キーの場合は勇者を１歩下へ
-                y++;
+                move(down);
                 break;
         }
 
@@ -114,6 +114,36 @@ public class MainPanel extends JPanel implements KeyListener{
     public void keyTyped(KeyEvent e){
     }
 
+    private boolean isHit(int x, int y){
+        // (x,y)に壁があったら進まない
+        if(map[y][x] == 1){
+            return true;
+        }
+
+        // なければ進む
+        return false;
+    }
+
+    private void move(int dir){
+        // dirの方向でぶつからなければ移動する
+        switch (dir){
+            case left :
+                if(! isHit(x-1, y)) x--;
+                break;
+
+            case right :
+                if(! isHit(x+1, y)) x++;
+                break;
+
+            case up :
+                if(! isHit(x, y-1)) y--;
+                break;
+
+            case down :
+                if(! isHit(x, y+1)) y++;
+                break;
+        }
+    }
 
     private  void loadImage(){
         ImageIcon icon = new ImageIcon("/Users/e165729/IdeaProjects/Report7/src/main/java/jp/ac/uryukyu/ie/e165729/image/hero.gif");
