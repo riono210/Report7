@@ -48,9 +48,9 @@ public class Chara implements Common {
         threadAnime.start();
     }
 
-    public void draw(Graphics g) {
+    public void draw(Graphics g, int offsetX, int offsetY) {
         // countの値に応じてキャラクターの画像を入れ替える
-        g.drawImage(image, x * cs, y * cs, x * cs + cs, y * cs + cs,
+        g.drawImage(image, x * cs + offsetX, y * cs + offsetY, x * cs + offsetX + cs, y * cs + offsetY + cs,
                 count * cs, direction * cs, cs + count * cs, direction * cs + cs, panel);
     }
 
@@ -77,6 +77,14 @@ public class Chara implements Common {
                 direction = down;
                 break;
         }
+    }
+
+    public int getX(){
+        return x;
+    }
+
+    public int getY(){
+        return y;
     }
 
     private void loadImage(String filename) {

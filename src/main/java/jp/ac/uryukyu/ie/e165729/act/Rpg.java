@@ -1,6 +1,6 @@
 package jp.ac.uryukyu.ie.e165729.act;
 
-import java.awt.*;
+import java.awt.Container;
 
 import javax.swing.JFrame;
 
@@ -9,7 +9,7 @@ import javax.swing.JFrame;
  */
 public class Rpg extends JFrame{
     public Rpg(){
-        setTitle("オブジェクト化");
+        setTitle("スクロールっす");
 
         MainPanel panel = new MainPanel();
         Container contentPane = getContentPane();

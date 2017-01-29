@@ -2,11 +2,10 @@ package jp.ac.uryukyu.ie.e165729.act;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.lang.management.ManagementFactory;
 
-import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 
@@ -15,14 +14,12 @@ import javax.swing.JPanel;
  */
 public class MainPanel extends JPanel implements KeyListener, Common{
     // ウィンドウの大きさ
-    private static final int width = 640;
-    private static final int height = 480;
+    public static final int width = 480;
+    public static final int height = 480;
 
     private Map map;
 
     private Chara hero;
-
-    private MainPanel panel;
 
     public MainPanel(){
         // パネルの推奨サイズの設定
@@ -41,11 +38,23 @@ public class MainPanel extends JPanel implements KeyListener, Common{
     public void paintComponent(Graphics g){
         super.paintComponent(g);
 
+        // X方向のオフセットを計算(基本offsetXの値はマイナス)
+        int offsetX = (MainPanel.width / 2) - (hero.getX()*cs);
+        // マップ端ではスクロールしないようにする
+        offsetX = Math.min(offsetX, 0);
+        offsetX = Math.max(offsetX, MainPanel.width - Map.width);
+
+        // Y方向のオフセットを計算(offsetの値はマイナス)
+        int offsetY = (MainPanel.height / 2) - (hero.getY()*cs);
+        // マップ端ではスクロールしないようにする
+        offsetY = Math.min(offsetY, 0);
+        offsetY = Math.max(offsetY, MainPanel.height - Map.height);
+
         // マップを描く
-        map.draw(g);
+        map.draw(g, offsetX, offsetY);
 
         // 勇者を描く
-        hero.draw(g);
+        hero.draw(g, offsetX, offsetY);
     }
 
     public void keyPressed(KeyEvent e){
