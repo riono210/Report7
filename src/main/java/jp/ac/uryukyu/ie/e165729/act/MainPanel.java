@@ -1,10 +1,9 @@
 package jp.ac.uryukyu.ie.e165729.act;
 
-import java.awt.Dimension;
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.lang.management.ManagementFactory;
+import java.util.Random;
 
 import javax.swing.JPanel;
 
@@ -19,9 +18,12 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
 
     // マップ
     private Map map;
-
     // 勇者
     private Chara hero;
+    // 王様
+    private Chara king;
+    // 兵士
+    private Chara soldier;
 
     // アクションキー
     private ActionKey downKey;
@@ -31,6 +33,9 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
 
     // ゲームループ
     private Thread  gameLoop;
+
+    // 乱数生成
+    private Random rand = new Random();
 
     public MainPanel(){
         // パネルの推奨サイズの設定
@@ -47,9 +52,11 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
         upKey = new ActionKey();
 
         // マップを作成
-        map = new Map(this);
+        map = new Map("/Users/e165729/IdeaProjects/Report7/src/main/java/jp/ac/uryukyu/ie/e165729/map/map.dat",this);
         // 勇者を作成
-        hero = new Chara(1, 1, "/Users/e165729/IdeaProjects/Report7/src/main/java/jp/ac/uryukyu/ie/e165729/image/Hero.png", map);
+        hero = new Chara(4, 4, "/Users/e165729/IdeaProjects/Report7/src/main/java/jp/ac/uryukyu/ie/e165729/image/Hero.png", map);
+        //
+
 
         // ゲームループの開始
         gameLoop = new Thread(this);
@@ -60,16 +67,16 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
         super.paintComponent(g);
 
         // X方向のオフセットを計算(基本offsetXの値はマイナス)
-        int offsetX = (MainPanel.WIDTH / 2) - (hero.getX()*CS);
+        int offsetX = (MainPanel.WIDTH / 2) - (hero.getPx());
         // マップ端ではスクロールしないようにする
         offsetX = Math.min(offsetX, 0);
-        offsetX = Math.max(offsetX, MainPanel.WIDTH - Map.WIDTH);
+        offsetX = Math.max(offsetX, MainPanel.WIDTH - map.getWidth());
 
         // Y方向のオフセットを計算(offsetの値はマイナス)
-        int offsetY = (MainPanel.HEIGHT / 2) - (hero.getY()*CS);
+        int offsetY = (MainPanel.HEIGHT / 2) - (hero.getPy());
         // マップ端ではスクロールしないようにする
         offsetY = Math.min(offsetY, 0);
-        offsetY = Math.max(offsetY, MainPanel.HEIGHT - Map.HEIGHT);
+        offsetY = Math.max(offsetY, MainPanel.HEIGHT - map.getHeight());
 
         // マップを描く
         map.draw(g, offsetX, offsetY);
@@ -80,15 +87,14 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
 
     public void run(){
         while (true){
-            // keyオブジェクトの状態を見て方向を決定する
-            if (downKey.isPressed()){
-                hero.move(DOWN);
-            }else if(leftKey.isPressed()){
-                hero.move(LEFT);
-            }else if(rightKey.isPressed()){
-                hero.move(RIGHT);
-            }else if(upKey.isPressed()){
-                hero.move(UP);
+            // キー入力をチェックする
+            checkInput();
+
+            // 移動中(スクロール)なら移動する
+            if(hero.isMoving()) {
+                if (hero.move()) {   // 移動(スクロール)
+                    // 移動が完了した後の処理はここにかく
+                }
             }
 
             // 再描写
@@ -96,12 +102,41 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
 
             // 休止
             try{
-                Thread.sleep(200);
+                Thread.sleep(20);
             }catch (InterruptedException e){
                 e.printStackTrace();
             }
         }
     }
+
+
+    private void checkInput(){
+        if(downKey.isPressed()){ //下
+            if(!hero.isMoving()){        // 移動中でなければ
+                hero.setDirection(DOWN); // 方向をセットして
+                hero.setMoving(true);    // 移動(スクロール)開始
+            }
+        }
+        if(leftKey.isPressed()){ // 左
+            if(!hero.isMoving()){
+                hero.setDirection(LEFT);
+                hero.setMoving(true);
+            }
+        }
+        if(rightKey.isPressed()){ // 右
+            if(!hero.isMoving()){
+                hero.setDirection(RIGHT);
+                hero.setMoving(true);
+            }
+        }
+        if(upKey.isPressed()){ // 上
+            if(!hero.isMoving()){
+                hero.setDirection(UP);
+                hero.setMoving(true);
+            }
+        }
+    }
+
 
     /**
      * キーが押されたらキーの状態を「押された」にする
