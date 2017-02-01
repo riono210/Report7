@@ -5,10 +5,10 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.io.File;
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URL;
+import java.io.FileReader;
+import java.io.FileInputStream;
+
 
 import javax.swing.*;
 import javax.swing.ImageIcon;
@@ -125,8 +125,9 @@ public class Map implements Common {
      */
     private void load(String filename){
         try {
-            BufferedReader br = new BufferedReader(
-                    new FileReader(filename));
+            FileInputStream fs = new FileInputStream(new File(filename).getAbsolutePath());
+            InputStreamReader in = new InputStreamReader(fs);
+            BufferedReader br = new BufferedReader(in);
             // rowを読み込む
             String line = br.readLine();
             row = Integer.parseInt(line);
@@ -154,14 +155,13 @@ public class Map implements Common {
      * イメージをロード
      */
     private void loadImage(){
-        ClassLoader cl = this.getClass().getClassLoader();
-        ImageIcon icon = new ImageIcon("/Users/e165729/IdeaProjects/Report7/src/main/java/jp/ac/uryukyu/ie/e165729/image/floor.gif");
+        ImageIcon icon = new ImageIcon(new File("src/main/resources/floor.gif").getAbsolutePath());
         floorImage = icon.getImage();
 
-        icon = new ImageIcon("/Users/e165729/IdeaProjects/Report7/src/main/java/jp/ac/uryukyu/ie/e165729/image/wall.gif");
+        icon = new ImageIcon(new File("src/main/resources//wall.gif").getAbsolutePath());
         wallImage = icon.getImage();
 
-        icon = new ImageIcon("/Users/e165729/IdeaProjects/Report7/src/main/java/jp/ac/uryukyu/ie/e165729/image/throne.gif");
+        icon = new ImageIcon(new File("src/main/resources/throne.gif").getAbsolutePath());
         throneImage = icon.getImage();
     }
 
