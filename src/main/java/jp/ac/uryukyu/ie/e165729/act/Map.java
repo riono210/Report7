@@ -155,13 +155,13 @@ public class Map implements Common {
      * イメージをロード
      */
     private void loadImage(){
-        ImageIcon icon = new ImageIcon(new File("src/main/resources/floor.gif").getAbsolutePath());
+        ImageIcon icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/floor.gif").getAbsolutePath());
         floorImage = icon.getImage();
 
-        icon = new ImageIcon(new File("src/main/resources//wall.gif").getAbsolutePath());
+        icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/wall.gif").getAbsolutePath());
         wallImage = icon.getImage();
 
-        icon = new ImageIcon(new File("src/main/resources/throne.gif").getAbsolutePath());
+        icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/throne.gif").getAbsolutePath());
         throneImage = icon.getImage();
     }
 
