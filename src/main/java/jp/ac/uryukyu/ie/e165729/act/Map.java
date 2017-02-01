@@ -8,7 +8,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.FileReader;
 import java.io.FileInputStream;
-import java.net.URL;
+
 
 
 import javax.swing.*;
@@ -58,9 +58,9 @@ public class Map implements Common {
     // メインパネルへの参照
     private MainPanel panel;
 
-    public Map(MainPanel panel){
+    public Map(String filename, MainPanel panel){
         // マップをロード
-        //load(filename);
+        load(filename);
 
         // イメージをロード
         loadImage();
@@ -150,32 +150,30 @@ public class Map implements Common {
         try {
 //            ビルド用
             ClassLoader cls = this.getClass().getClassLoader();
-            File file = new File(cls.getResource(filename) + filename);
-            BufferedReader br = new BufferedReader(
-                    new FileReader(file));
+            BufferedReader br = new BufferedReader(new InputStreamReader(cls.getResourceAsStream(filename)));
 
 //            FileInputStream fs = new FileInputStream( new File(filename).getAbsolutePath());
 //            InputStreamReader in = new InputStreamReader(fs);
 //            BufferedReader br = new BufferedReader(in);
 
             // rowを読み込む
-//            String line = br.readLine();
-//            row = Integer.parseInt(line);
+            String line = br.readLine();
+            row = Integer.parseInt(line);
             // colを読み込む
-//            line = br.readLine();
-//            col = Integer.parseInt(line);
+            line = br.readLine();
+            col = Integer.parseInt(line);
             // マップサイズを設定
-           // width = col * CS;
-            //height = row * CS;
+            width = col * CS;
+            height = row * CS;
             // マップを作成
-//            map = new int [row][col];
-//            for(int i = 0; i < row; i++) {
-//                line = br.readLine();
-//                for (int j = 0; j < col; j++) {
-//                    map[i][j] = Integer.parseInt(line.charAt(j) + "");
-//                }
-//            }
-//          show();
+            map = new int [row][col];
+            for(int i = 0; i < row; i++) {
+                line = br.readLine();
+                for (int j = 0; j < col; j++) {
+                    map[i][j] = Integer.parseInt(line.charAt(j) + "");
+                }
+            }
+          //show();
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -187,6 +185,7 @@ public class Map implements Common {
     private void loadImage(){
         ClassLoader cl = this.getClass().getClassLoader();
         ImageIcon icon = new ImageIcon(cl.getResource("image/floor.gif"));
+        System.out.println(cl.getResource("image/floor.gif"));
         //ImageIcon icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/floor.gif").getAbsolutePath());
         floorImage = icon.getImage();
 
