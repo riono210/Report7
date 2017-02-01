@@ -4,10 +4,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.io.File;
 import java.net.URL;
-import java.nio.file.LinkOption;
-import java.nio.file.Paths;
 
-import javax.print.DocFlavor;
 import javax.swing.ImageIcon;
 /**
  * Created by e165729 on 2017/01/29.
@@ -309,11 +306,10 @@ public class Chara implements Common {
     }
 
     private void loadImage(String filename) {
-           System.out.print(new File(filename).getAbsolutePath());
-            ImageIcon icon = new ImageIcon(new File(filename).getAbsolutePath());
-            image = icon.getImage();
-        }
-
+        System.out.println(new File(filename).getAbsolutePath());
+        ImageIcon icon = new ImageIcon(new File(filename).getAbsolutePath());
+        image = icon.getImage();
+    }
 
     // アニメーションクラス
     private class AnimationThread extends Thread {

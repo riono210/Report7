@@ -1,16 +1,13 @@
 package jp.ac.uryukyu.ie.e165729.act;
 
-import java.awt.*;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.io.File;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.FileReader;
 import java.io.FileInputStream;
 
 
-import javax.swing.*;
 import javax.swing.ImageIcon;
 
 /**
