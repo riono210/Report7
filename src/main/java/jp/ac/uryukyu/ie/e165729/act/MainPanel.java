@@ -52,9 +52,11 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
         upKey = new ActionKey();
 
         // マップを作成
-        map = new Map("src/main/java/jp/ac/uryukyu/ie/e165729/map/map.dat",this);
+        // ビルド時　map/map.dat     // src/main/java/jp/ac/uryukyu/ie/e165729/
+        map = new Map(this);
         // 勇者を作成
-        hero = new Chara(4, 4, "src/main/java/jp/ac/uryukyu/ie/e165729/image/Hero.png", map);
+        // ビルド時　image/Hero.png
+        hero = new Chara(4, 4, "image/Hero.png", map);
         //
 
 

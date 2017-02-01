@@ -1,13 +1,17 @@
 package jp.ac.uryukyu.ie.e165729.act;
 
+import java.awt.*;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.io.File;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.FileReader;
 import java.io.FileInputStream;
+import java.net.URL;
 
 
+import javax.swing.*;
 import javax.swing.ImageIcon;
 
 /**
@@ -15,15 +19,36 @@ import javax.swing.ImageIcon;
  */
 public class Map implements Common {
     // マップ
-    private int[][] map;
+    private int[][] map ={
+            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,1,1,1,1,1,0,0,0,0,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,1},
+            {1,0,0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1},
+            {1,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1},
+            {1,0,0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1},
+            {1,0,0,0,0,1,1,0,1,1,0,0,0,0,1,0,0,0,0,0,1,1,0,1,1,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}};
+
 
     // マップの行と列の大きさ(ピクセル)
     private int row = 20;
     private int col = 30;
 
     // マップ全体の大きさ(ピクセル)
-    private int width;
-    private int height;
+    private int width = col*CS;
+    private int height = row*CS;
 
     // チップセット
     private Image floorImage;
@@ -33,9 +58,9 @@ public class Map implements Common {
     // メインパネルへの参照
     private MainPanel panel;
 
-    public Map(String filename, MainPanel panel){
+    public Map(MainPanel panel){
         // マップをロード
-        load(filename);
+        //load(filename);
 
         // イメージをロード
         loadImage();
@@ -67,6 +92,7 @@ public class Map implements Common {
 
                     case 2: // 王座
                         g.drawImage(throneImage, tilesToPixels(j) + offsetX, tilesToPixels(i) + offsetY, panel);
+                        break;
                 }
             }
         }
@@ -122,26 +148,33 @@ public class Map implements Common {
      */
     private void load(String filename){
         try {
-            FileInputStream fs = new FileInputStream(new File(filename).getAbsolutePath());
-            InputStreamReader in = new InputStreamReader(fs);
-            BufferedReader br = new BufferedReader(in);
+//            ビルド用
+            ClassLoader cls = this.getClass().getClassLoader();
+            File file = new File(cls.getResource(filename) + filename);
+            BufferedReader br = new BufferedReader(
+                    new FileReader(file));
+
+//            FileInputStream fs = new FileInputStream( new File(filename).getAbsolutePath());
+//            InputStreamReader in = new InputStreamReader(fs);
+//            BufferedReader br = new BufferedReader(in);
+
             // rowを読み込む
-            String line = br.readLine();
-            row = Integer.parseInt(line);
+//            String line = br.readLine();
+//            row = Integer.parseInt(line);
             // colを読み込む
-            line = br.readLine();
-            col = Integer.parseInt(line);
+//            line = br.readLine();
+//            col = Integer.parseInt(line);
             // マップサイズを設定
-            width = col * CS;
-            height = row * CS;
+           // width = col * CS;
+            //height = row * CS;
             // マップを作成
-            map = new int [row][col];
-            for(int i = 0; i < row; i++) {
-                line = br.readLine();
-                for (int j = 0; j < col; j++) {
-                    map[i][j] = Integer.parseInt(line.charAt(j) + "");
-                }
-            }
+//            map = new int [row][col];
+//            for(int i = 0; i < row; i++) {
+//                line = br.readLine();
+//                for (int j = 0; j < col; j++) {
+//                    map[i][j] = Integer.parseInt(line.charAt(j) + "");
+//                }
+//            }
 //          show();
         }catch (Exception e){
             e.printStackTrace();
@@ -152,13 +185,17 @@ public class Map implements Common {
      * イメージをロード
      */
     private void loadImage(){
-        ImageIcon icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/floor.gif").getAbsolutePath());
+        ClassLoader cl = this.getClass().getClassLoader();
+        ImageIcon icon = new ImageIcon(cl.getResource("image/floor.gif"));
+        //ImageIcon icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/floor.gif").getAbsolutePath());
         floorImage = icon.getImage();
 
-        icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/wall.gif").getAbsolutePath());
+        icon = new ImageIcon(cl.getResource("image/wall.gif"));
+        //icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/wall.gif").getAbsolutePath());
         wallImage = icon.getImage();
 
-        icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/throne.gif").getAbsolutePath());
+        icon = new ImageIcon(cl.getResource("image/throne.gif"));
+        //icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/throne.gif").getAbsolutePath());
         throneImage = icon.getImage();
     }
 

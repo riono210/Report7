@@ -1,5 +1,4 @@
 package jp.ac.uryukyu.ie.e165729.act;
-
 /**
  * Created by e165729 on 2017/01/28.
  */

@@ -113,7 +113,7 @@ public class Chara implements Common {
         int nextX = x;
         int nextY = y+1;
         // 障害物のないところでmap外に移動しないように
-        if(nextY > map.getRow() - 1) nextY = map.getRow() - 1;
+        if(nextY > map.getRow()- 1) nextY = map.getRow() - 1;
 
         // その場所に障害物がなければ移動を開始
         if(!map.isHit(nextX, nextY)){
@@ -306,8 +306,9 @@ public class Chara implements Common {
     }
 
     private void loadImage(String filename) {
-        System.out.println(new File(filename).getAbsolutePath());
-        ImageIcon icon = new ImageIcon(new File(filename).getAbsolutePath());
+        ClassLoader cl = this.getClass().getClassLoader();
+        ImageIcon icon = new ImageIcon(cl.getResource(filename));
+        //ImageIcon icon = new ImageIcon(new File(filename).getAbsolutePath());
         image = icon.getImage();
     }
 
