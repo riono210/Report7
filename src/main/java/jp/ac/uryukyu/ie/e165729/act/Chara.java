@@ -307,9 +307,9 @@ public class Chara implements Common {
 
     private void loadImage(String filename) {
         // ビルド用
-        ClassLoader cl = this.getClass().getClassLoader();
-        ImageIcon icon = new ImageIcon(cl.getResource(filename));
-        //ImageIcon icon = new ImageIcon(new File(filename).getAbsolutePath());
+//        ClassLoader cl = this.getClass().getClassLoader();
+//        ImageIcon icon = new ImageIcon(cl.getResource(filename));
+        ImageIcon icon = new ImageIcon(new File(filename).getAbsolutePath());
         image = icon.getImage();
     }
 

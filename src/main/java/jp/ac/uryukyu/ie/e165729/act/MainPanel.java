@@ -53,12 +53,20 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
 
         // マップを作成
         // ビルド時　     // src/main/java/jp/ac/uryukyu/ie/e165729/
-        map = new Map("map/maf",this);
+        map = new Map("src/main/java/jp/ac/uryukyu/ie/e165729/map/map.txt",this);
         // 勇者を作成
         // ビルド時　image/Hero.png
-        hero = new Chara(4, 4, "image/Hero.png", map);
-        //
+        hero = new Chara(4, 4, "src/main/java/jp/ac/uryukyu/ie/e165729/image/Hero.png", map);
+        // 王様を生成
+        king = new Chara(6, 6, "src/main/java/jp/ac/uryukyu/ie/e165729/image/King.png", map);
+        // 兵士を生成
+        soldier = new Chara(8, 9, "src/main/java/jp/ac/uryukyu/ie/e165729/image/Soldier.png",map);
 
+        // マップにキャラを登録
+        // キャラクターはマップに属する
+        map.addChara(hero);
+        map.addChara(king);
+        map.addChara(soldier);
 
         // ゲームループの開始
         gameLoop = new Thread(this);
@@ -83,8 +91,6 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
         // マップを描く
         map.draw(g, offsetX, offsetY);
 
-        // 勇者を描く
-        hero.draw(g, offsetX, offsetY);
     }
 
     public void run(){
@@ -92,12 +98,10 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
             // キー入力をチェックする
             checkInput();
 
-            // 移動中(スクロール)なら移動する
-            if(hero.isMoving()) {
-                if (hero.move()) {   // 移動(スクロール)
-                    // 移動が完了した後の処理はここにかく
-                }
-            }
+            // 勇者の移動処理
+            heroMove();
+            // その他のキャラクターの移動処理
+            charaMove();
 
             // 再描写
             repaint();
@@ -111,7 +115,9 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
         }
     }
 
-
+    /**
+     * キー入力をチェックする
+     */
     private void checkInput(){
         if(downKey.isPressed()){ //下
             if(!hero.isMoving()){        // 移動中でなければ
@@ -136,6 +142,30 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
                 hero.setDirection(UP);
                 hero.setMoving(true);
             }
+        }
+    }
+
+
+    private void heroMove(){
+        // 移動(スクロール)中なら移動する
+        if(hero.isMoving()){
+            if(hero.move()){
+                // 移動が完了した後の処理はここに
+            }
+        }
+    }
+
+    /**
+     * 勇者以外の移動
+     */
+    private void charaMove(){
+        if(soldier.isMoving()){   // 移動中なら
+            soldier.move();       // 移動を続ける
+        }else if(rand.nextDouble() < 0.009){
+            // 移動していない場合は0.02の確率で移動を開始する
+            // 方向はランダム
+            soldier.setDirection(rand.nextInt(4));
+            soldier.setMoving(true);
         }
     }
 

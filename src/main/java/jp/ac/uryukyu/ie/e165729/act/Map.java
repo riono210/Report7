@@ -3,11 +3,11 @@ package jp.ac.uryukyu.ie.e165729.act;
 import java.awt.*;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.io.File;
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.FileReader;
 import java.io.FileInputStream;
+import java.io.File;
+import java.io.InputStreamReader;
+import java.util.Vector;
 
 
 
@@ -55,6 +55,9 @@ public class Map implements Common {
     private Image wallImage;
     private Image throneImage;
 
+    // このマップにいるキャラクターたち
+    private Vector charas = new Vector();
+
     // メインパネルへの参照
     private MainPanel panel;
 
@@ -96,16 +99,42 @@ public class Map implements Common {
                 }
             }
         }
+        // このマップにいるキャラクターを描写
+        for(int n = 0; n < charas.size(); n++){
+            Chara chara = (Chara)charas.get(n);
+            chara.draw(g, offsetX, offsetY);
+        }
     }
 
+    /**
+     * (x,y)にぶつかるものがあるか調べる
+     * @param x マップのx座標
+     * @param y マップのy座標
+     * @return (x,y)にぶつかるものがあったらtrueを返す
+     */
     public boolean isHit(int x, int y){
         // (x,y)に壁か王座があったらぶつかる
         if(map[y][x] == 1 || map[y][x] == 2){
             return true;
         }
 
+        for(int i = 0; i < charas.size(); i++){
+            Chara chara = (Chara) charas.get(i);
+            if(chara.getX() == x && chara.getY() == y){
+                return true;
+            }
+        }
+
         // なければ進む
         return false;
+    }
+
+    /**
+     * このマップにキャラクターを追加
+     * @param chara　キャラクター
+     */
+    public void addChara(Chara chara){
+        charas.add(chara);
     }
 
     /**
@@ -149,12 +178,12 @@ public class Map implements Common {
     private void load(String filename){
         try {
 //            ビルド用
-            ClassLoader cls = this.getClass().getClassLoader();
-            BufferedReader br = new BufferedReader(new InputStreamReader(cls.getResourceAsStream(filename)));
+//            ClassLoader cls = this.getClass().getClassLoader();
+//            BufferedReader br = new BufferedReader(new InputStreamReader(cls.getResourceAsStream(filename)));
 
-//            FileInputStream fs = new FileInputStream( new File(filename).getAbsolutePath());
-//            InputStreamReader in = new InputStreamReader(fs);
-//            BufferedReader br = new BufferedReader(in);
+            FileInputStream fs = new FileInputStream( new File(filename).getAbsolutePath());
+            InputStreamReader in = new InputStreamReader(fs);
+            BufferedReader br = new BufferedReader(in);
 
             // rowを読み込む
             String line = br.readLine();
@@ -183,18 +212,18 @@ public class Map implements Common {
      * イメージをロード
      */
     private void loadImage(){
-        ClassLoader cl = this.getClass().getClassLoader();
-        ImageIcon icon = new ImageIcon(cl.getResource("image/floor.gif"));
-        System.out.println(cl.getResource("image/floor.gif"));
-        //ImageIcon icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/floor.gif").getAbsolutePath());
+        // ビルド用
+//        ClassLoader cl = this.getClass().getClassLoader();
+//        ImageIcon icon = new ImageIcon(cl.getResource("image/floor.gif"));
+        ImageIcon icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/floor.gif").getAbsolutePath());
         floorImage = icon.getImage();
 
-        icon = new ImageIcon(cl.getResource("image/wall.gif"));
-        //icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/wall.gif").getAbsolutePath());
+//        icon = new ImageIcon(cl.getResource("image/wall.gif"));
+        icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/wall.gif").getAbsolutePath());
         wallImage = icon.getImage();
 
-        icon = new ImageIcon(cl.getResource("image/throne.gif"));
-        //icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/throne.gif").getAbsolutePath());
+//        icon = new ImageIcon(cl.getResource("image/throne.gif"));
+        icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/throne.gif").getAbsolutePath());
         throneImage = icon.getImage();
     }
 
