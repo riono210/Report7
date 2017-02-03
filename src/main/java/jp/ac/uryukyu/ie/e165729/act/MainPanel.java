@@ -155,19 +155,20 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
      * 勇者以外の移動
      */
     private void charaMove(){
+        // マップにいるキャラを取得
         Vector charas = map.getCharas();
-        for(int i = 0; i < charas.size(); i++){
+        for(int i = 0; i < charas.size() -1; i++){
             Chara chara = (Chara)charas.get(i);
             //  キャラクターの移動タイプを調べる
-            if(chara.getMoveType() == 0){     // 移動するタイプなら
+            if(chara.getMoveType() == 1){     // 移動するタイプなら
                 if(chara.isMoving()) {    // スクロール中なら
                     chara.move();         // 移動する
+                } else if(rand.nextDouble() < Chara.PROB_MOVE) {
+                    // 移動しないタイプの場合はChara.PROB_MOVEの確率で移動する
+                    // 方向はランダムで決める
+                    chara.setDirection(rand.nextInt(4));
+                    chara.setMoving(true);
                 }
-            }else if(rand.nextDouble() < Chara.PROB_MOVE){
-                // 移動しないタイプの場合はChara.PROB_MOVEの確率で移動する
-                // 方向はランダムで決める
-                chara.setDirection(rand.nextInt(4));
-                chara.setMoving(true);
             }
         }
     }

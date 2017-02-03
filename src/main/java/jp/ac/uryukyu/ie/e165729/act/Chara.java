@@ -14,7 +14,7 @@ public class Chara implements Common {
     private static final int SPEED = 4;
 
     // キャラクターの移動確率
-    public static final double PROB_MOVE = 0.009;
+    public static final double PROB_MOVE = 0.02;
 
     // キャラクターのイメージ
     private static Image charaImage;
@@ -62,7 +62,7 @@ public class Chara implements Common {
         px = x * CS;
         py = y * CS;
 
-        direction = DOWN;
+//        direction = DOWN;
         count = 0;
         switchConut = 0;
 
@@ -74,7 +74,6 @@ public class Chara implements Common {
         // キャラクターアニメーション用スレッドの開始
         threadAnime = new Thread(new AnimationThread());
         threadAnime.start();
-//        threadActive = false;
 
     }
 
@@ -349,31 +348,29 @@ public class Chara implements Common {
     public class AnimationThread extends Thread {
 
         public void run() {
-                while (true) {
-                    if (true) {
-                        // countを切り替える
-                        if (count == 0) {
-                            count = 1;
-                        } else if (count == 1 && switchConut == 1) {
-                            count = 0;
-                            switchConut = 0;
-                        } else if (count == 1) {
-                            count = 2;
-                        } else if (count == 2) {
-                            count = 1;
-                            switchConut = 1;
-                        }
-
-                        // 300ミリ秒停止，300ミリ秒ごとに絵を入れ替える
-                        try {
-                            Thread.sleep(300);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
+            while (true) {
+                // countを切り替える
+                if (count == 0) {
+                    count = 1;
+                } else if (count == 1 && switchConut == 1) {
+                    count = 0;
+                    switchConut = 0;
+                } else if (count == 1) {
+                    count = 2;
+                } else if (count == 2) {
+                    count = 1;
+                    switchConut = 1;
                 }
 
+                // 300ミリ秒停止，300ミリ秒ごとに絵を入れ替える
+                try {
+                    Thread.sleep(300);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-    }
+     }
 }
+
 
