@@ -3,6 +3,7 @@ package jp.ac.uryukyu.ie.e165729.act;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.Rectangle;
 import java.util.Random;
 import java.util.Vector;
 
@@ -21,22 +22,24 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
     private Map map;
     // 勇者
     private Chara hero;
-    // 王様
-    private Chara king;
-    // 兵士
-    private Chara soldier;
 
     // アクションキー
     private ActionKey downKey;
     private ActionKey leftKey;
     private ActionKey rightKey;
     private ActionKey upKey;
+    private ActionKey spaceKey;
 
     // ゲームループ
     private Thread  gameLoop;
 
     // 乱数生成
     private Random rand = new Random();
+
+    // ウィンドウ
+    private MassageWindow massageWindow;
+    // ウィンドウを表示する領域
+    private static Rectangle WND_RECT = new Rectangle(62, 324, 356, 140);
 
     public MainPanel(){
         // パネルの推奨サイズの設定
@@ -51,6 +54,7 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
         leftKey = new ActionKey();
         rightKey = new ActionKey();
         upKey = new ActionKey();
+        spaceKey = new ActionKey(ActionKey.DETECT_INITIAL_PRESS_ONLY);
 
         // マップを作成
         // ビルド時　   map/map.txt  // src/main/java/jp/ac/uryukyu/ie/e165729/
@@ -61,6 +65,9 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
         // マップにキャラを登録
         // キャラクターはマップに属する
         map.addChara(hero);
+
+        // ウィンドウを追加
+        massageWindow = new MassageWindow(WND_RECT);
 
         // ゲームループの開始
         gameLoop = new Thread(this);
@@ -85,17 +92,26 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
         // マップを描く
         map.draw(g, offsetX, offsetY);
 
+        // メッセージウィンドウを描写
+        massageWindow.draw(g);
+
     }
 
     public void run(){
-        while (true){
+        while (true) {
             // キー入力をチェックする
-            checkInput();
+            if (massageWindow.isVisible()) {   // メッセージウィンドウ表示中
+                massageWindowChackInput();
+            } else {
+                mainWindowCheckInput();
+            }
 
-            // 勇者の移動処理
-            heroMove();
-            // その他のキャラクターの移動処理
-            charaMove();
+            if(!massageWindow.isVisible()){
+                // 勇者の移動処理
+                heroMove();
+                // その他のキャラクターの移動処理
+                charaMove();
+            }
 
             // 再描写
             repaint();
@@ -112,7 +128,7 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
     /**
      * キー入力をチェックする
      */
-    private void checkInput(){
+    private void mainWindowCheckInput(){
         if(downKey.isPressed()){ //下
             if(!hero.isMoving()){        // 移動中でなければ
                 hero.setDirection(DOWN); // 方向をセットして
@@ -137,8 +153,23 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
                 hero.setMoving(true);
             }
         }
+        if(spaceKey.isPressed()){
+            // 移動中は表示できない
+            if(hero.isMoving()) return;
+            if(!massageWindow.isVisible()){
+                massageWindow.show();
+            }
+        }
     }
 
+    /**
+     * メッセージウィンドウでのキー入力をチェックする
+     */
+    private void massageWindowChackInput(){
+        if(spaceKey.isPressed()){
+            massageWindow.hide();
+        }
+    }
 
     private void heroMove(){
         // 移動(スクロール)中なら移動する
@@ -157,7 +188,7 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
     private void charaMove(){
         // マップにいるキャラを取得
         Vector charas = map.getCharas();
-        for(int i = 0; i < charas.size() -1; i++){
+        for(int i = 0; i < charas.size(); i++){
             Chara chara = (Chara)charas.get(i);
             //  キャラクターの移動タイプを調べる
             if(chara.getMoveType() == 1){     // 移動するタイプなら
@@ -195,6 +226,9 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
         if(keyCode == KeyEvent.VK_UP){
             upKey.press();
         }
+        if(keyCode == KeyEvent.VK_SPACE){
+            spaceKey.press();
+        }
     }
 
     /**
@@ -216,6 +250,9 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
         }
         if(keyCode == KeyEvent.VK_UP){
             upKey.release();
+        }
+        if(keyCode == KeyEvent.VK_SPACE){
+            spaceKey.release();
         }
     }
 
