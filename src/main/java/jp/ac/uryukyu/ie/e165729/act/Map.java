@@ -1,6 +1,5 @@
 package jp.ac.uryukyu.ie.e165729.act;
 
-import java.awt.*;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.io.BufferedReader;
@@ -8,10 +7,8 @@ import java.io.FileInputStream;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.util.Vector;
+import java.util.StringTokenizer;
 
-
-
-import javax.swing.*;
 import javax.swing.ImageIcon;
 
 /**
@@ -51,9 +48,7 @@ public class Map implements Common {
     private int height = row*CS;
 
     // チップセット
-    private Image floorImage;
-    private Image wallImage;
-    private Image throneImage;
+    private static Image chipImage;
 
     // このマップにいるキャラクターたち
     private Vector charas = new Vector();
@@ -61,9 +56,12 @@ public class Map implements Common {
     // メインパネルへの参照
     private MainPanel panel;
 
-    public Map(String filename, MainPanel panel){
+    public Map(String filename, String eventFile, MainPanel panel){
         // マップをロード
         load(filename);
+
+        // イベントをロード
+        loadEvent(eventFile);
 
         // イメージをロード
         loadImage();
@@ -83,20 +81,14 @@ public class Map implements Common {
 
         for(int i = firstTileY; i < lastTileY; i++){
             for(int j = firstTileX; j < lastTileX; j++){
-                // mapの値に応じて絵を描く
-                switch (map[i][j]){
-                    case 0: // 床
-                        g.drawImage(floorImage, tilesToPixels(j) + offsetX, tilesToPixels(i) + offsetY, panel);
-                        break;
-
-                    case 1: // 壁
-                        g.drawImage(wallImage, tilesToPixels(j) + offsetX, tilesToPixels(i) + offsetY, panel);
-                        break;
-
-                    case 2: // 王座
-                        g.drawImage(throneImage, tilesToPixels(j) + offsetX, tilesToPixels(i) + offsetY, panel);
-                        break;
-                }
+                int mapChipNo = map[i][j];
+                // イメージ上の位置を求める
+                // マップイメージの大きさは8*8を想定
+                int cx = (mapChipNo % 8) * CS;
+                int cy = (mapChipNo / 8) * CS;
+                g.drawImage(chipImage, tilesToPixels(j) + offsetX, tilesToPixels(i) + offsetY,
+                        tilesToPixels(j) + offsetX + CS, tilesToPixels(i) + offsetY + CS,
+                        cx, cy, cx + CS, cy + CS, panel);
             }
         }
         // このマップにいるキャラクターを描写
@@ -118,6 +110,7 @@ public class Map implements Common {
             return true;
         }
 
+        // 他のキャラクターがいたらぶつかる
         for(int i = 0; i < charas.size(); i++){
             Chara chara = (Chara) charas.get(i);
             if(chara.getX() == x && chara.getY() == y){
@@ -171,6 +164,10 @@ public class Map implements Common {
         return height;
     }
 
+    public Vector getCharas(){
+        return charas;
+    }
+
     /**
      * ファイルからマップを読み込む
      * @param filename 読み込むマップデータのファイル名
@@ -209,26 +206,75 @@ public class Map implements Common {
     }
 
     /**
+     * イベントをロードする
+     * @param eventFile イベントファイル
+     */
+    private void loadEvent(String eventFile){
+        try{
+            // ビルド用
+//            ClassLoader cs = this.getClass().getClassLoader();
+//            BufferedReader br = new BufferedReader(new InputStreamReader(cs.getResourceAsStream(eventFile), "Shift_JIS"));
+
+            FileInputStream fs = new FileInputStream( new File(eventFile).getAbsolutePath());
+            InputStreamReader in = new InputStreamReader(fs);
+            BufferedReader br = new BufferedReader(in);
+
+            String line;
+            while ((line = br.readLine()) != null){
+                // 空行は読み飛ばす
+                if(line.equals("")) continue;
+                // コメント行は読み飛ばす
+                if(line.equals("#")) continue;
+                StringTokenizer st = new StringTokenizer(line, ",");
+                // イベント情報を取得する
+                // イベントタイプを取得してイベントごとに処理をする
+                String eventType = st.nextToken();
+                if(eventType.equals("CHARA")){      // キャラクターイベント
+                    makeCharacter(st);
+                }
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * イメージをロード
      */
     private void loadImage(){
         // ビルド用
 //        ClassLoader cl = this.getClass().getClassLoader();
-//        ImageIcon icon = new ImageIcon(cl.getResource("image/floor.gif"));
-        ImageIcon icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/floor.gif").getAbsolutePath());
-        floorImage = icon.getImage();
-
-//        icon = new ImageIcon(cl.getResource("image/wall.gif"));
-        icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/wall.gif").getAbsolutePath());
-        wallImage = icon.getImage();
-
-//        icon = new ImageIcon(cl.getResource("image/throne.gif"));
-        icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/throne.gif").getAbsolutePath());
-        throneImage = icon.getImage();
+//        ImageIcon icon = new ImageIcon(cl.getResource("image/mapchip.gif"));
+        ImageIcon icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/mapchip.gif").getAbsolutePath());
+        chipImage = icon.getImage();
     }
 
     /**
-     *
+     * キャラクターとキャラクターイベントを作成
+     */
+    public void makeCharacter(StringTokenizer st){
+        // イベントの座標
+        int x = Integer.parseInt(st.nextToken());
+        int y = Integer.parseInt(st.nextToken());
+        // キャラクター番号
+        int charaNo = Integer.parseInt(st.nextToken());
+        // 向き
+        int dir = Integer.parseInt(st.nextToken());
+        // 移動タイプ
+        int moveType = Integer.parseInt(st.nextToken());
+        // メッセージ
+        String massage = st.nextToken();
+        // キャラクターを作成
+        Chara c = new Chara(x, y, charaNo, dir, moveType, this);
+        // メッセージを登録
+        c.setMassage(massage);
+        // キャラクターベクトルに登録
+        charas.add(c);
+    }
+
+    /**
+     * デバッグ用マップ表示
      */
     public void show(){
         for(int i = 0; i <row; i++){

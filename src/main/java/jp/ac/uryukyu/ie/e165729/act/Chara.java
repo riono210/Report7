@@ -11,10 +11,16 @@ import javax.swing.ImageIcon;
  */
 public class Chara implements Common {
     // キャラクターの移動速度
-    private static int SPEED = 4;
+    private static final int SPEED = 4;
+
+    // キャラクターの移動確率
+    public static final double PROB_MOVE = 0.009;
 
     // キャラクターのイメージ
-    private Image image;
+    private static Image charaImage;
+
+    // キャラクターの番号
+    private int charaNo;
 
     // キャラクターの座標
     private int x, y; // 単位: マス
@@ -32,6 +38,11 @@ public class Chara implements Common {
     // 移動中の場合の移動ピクセル数
     private int movingLength;
 
+    // 移動方法
+    private int moveType;
+    // 話すメッセージ
+    private String massage;
+
     // キャラクターのアニメーション用スレッド
     private Thread threadAnime;
 
@@ -40,10 +51,13 @@ public class Chara implements Common {
 
     URL ur = null;
 
-    public Chara(int x, int y, String filename, Map map) {
+    public Chara(int x, int y, int charaNo, int direction, int moveType, Map map) {
         this.x = x;
         this.y = y;
         this.map = map;
+        this.charaNo = charaNo;
+        this.direction = direction;
+        this.moveType = moveType;
 
         px = x * CS;
         py = y * CS;
@@ -52,18 +66,24 @@ public class Chara implements Common {
         count = 0;
         switchConut = 0;
 
-        // イメージをロード
-        loadImage(filename);
+        // 初回イメージのロード
+        if(charaImage == null) {
+            loadImage();
+        }
 
         // キャラクターアニメーション用スレッドの開始
         threadAnime = new Thread(new AnimationThread());
         threadAnime.start();
+//        threadActive = false;
+
     }
 
     public void draw(Graphics g, int offsetX, int offsetY) {
+        int cx = (charaNo % 8) * (CS * 3);
+        int cy = (charaNo / 8) * (CS * 4);
         // countの値に応じてキャラクターの画像を入れ替える
-        g.drawImage(image, px + offsetX, py + offsetY, px + offsetX + CS, py + offsetY + CS,
-                count * CS, direction * CS, CS + count * CS, direction * CS + CS, null);
+        g.drawImage(charaImage, px + offsetX, py + offsetY, px + offsetX + CS, py + offsetY + CS,
+                cx + count * CS, cy + direction * CS, cx + CS + count * CS, cy + direction * CS + CS, null);
     }
 
     /**
@@ -305,38 +325,55 @@ public class Chara implements Common {
         movingLength = 0;
     }
 
-    private void loadImage(String filename) {
+    public String getMassage(){
+        return massage;
+    }
+
+    public void setMassage(String massage){
+        this.massage = massage;
+    }
+
+    public int getMoveType(){
+        return moveType;
+    }
+
+    private void loadImage() {
         // ビルド用
 //        ClassLoader cl = this.getClass().getClassLoader();
-//        ImageIcon icon = new ImageIcon(cl.getResource(filename));
-        ImageIcon icon = new ImageIcon(new File(filename).getAbsolutePath());
-        image = icon.getImage();
+//        ImageIcon icon = new ImageIcon(cl.getResource("chara.png"));
+        ImageIcon icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/chara.png").getAbsolutePath());
+        charaImage = icon.getImage();
     }
 
     // アニメーションクラス
-    private class AnimationThread extends Thread {
+    public class AnimationThread extends Thread {
+
         public void run() {
-            while (true) {
-                // countを切り替える
-                if (count == 0) {
-                    count = 1;
-                } else if (count == 1 && switchConut == 1) {
-                    count = 0;
-                    switchConut= 0;
-                } else if (count == 1) {
-                    count = 2;
-                } else if (count == 2) {
-                    count = 1;
-                    switchConut = 1;
+                while (true) {
+                    if (true) {
+                        // countを切り替える
+                        if (count == 0) {
+                            count = 1;
+                        } else if (count == 1 && switchConut == 1) {
+                            count = 0;
+                            switchConut = 0;
+                        } else if (count == 1) {
+                            count = 2;
+                        } else if (count == 2) {
+                            count = 1;
+                            switchConut = 1;
+                        }
+
+                        // 300ミリ秒停止，300ミリ秒ごとに絵を入れ替える
+                        try {
+                            Thread.sleep(300);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
 
-                // 300ミリ秒停止，300ミリ秒ごとに絵を入れ替える
-                try {
-                    Thread.sleep(300);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 }
+

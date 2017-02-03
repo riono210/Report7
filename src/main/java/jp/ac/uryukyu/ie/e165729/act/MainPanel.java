@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Random;
+import java.util.Vector;
 
 import javax.swing.JPanel;
 
@@ -52,21 +53,14 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
         upKey = new ActionKey();
 
         // マップを作成
-        // ビルド時　     // src/main/java/jp/ac/uryukyu/ie/e165729/
-        map = new Map("src/main/java/jp/ac/uryukyu/ie/e165729/map/map.txt",this);
+        // ビルド時　   map/map.txt  // src/main/java/jp/ac/uryukyu/ie/e165729/
+        map = new Map("src/main/java/jp/ac/uryukyu/ie/e165729/map/map.txt", "src/main/java/jp/ac/uryukyu/ie/e165729/event/event.txt",this);
         // 勇者を作成
-        // ビルド時　image/Hero.png
-        hero = new Chara(4, 4, "src/main/java/jp/ac/uryukyu/ie/e165729/image/Hero.png", map);
-        // 王様を生成
-        king = new Chara(6, 6, "src/main/java/jp/ac/uryukyu/ie/e165729/image/King.png", map);
-        // 兵士を生成
-        soldier = new Chara(8, 9, "src/main/java/jp/ac/uryukyu/ie/e165729/image/Soldier.png",map);
+        hero = new Chara(4, 4, 0, DOWN, 0,map);
 
         // マップにキャラを登録
         // キャラクターはマップに属する
         map.addChara(hero);
-        map.addChara(king);
-        map.addChara(soldier);
 
         // ゲームループの開始
         gameLoop = new Thread(this);
@@ -155,17 +149,26 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
         }
     }
 
+
+
     /**
      * 勇者以外の移動
      */
     private void charaMove(){
-        if(soldier.isMoving()){   // 移動中なら
-            soldier.move();       // 移動を続ける
-        }else if(rand.nextDouble() < 0.009){
-            // 移動していない場合は0.02の確率で移動を開始する
-            // 方向はランダム
-            soldier.setDirection(rand.nextInt(4));
-            soldier.setMoving(true);
+        Vector charas = map.getCharas();
+        for(int i = 0; i < charas.size(); i++){
+            Chara chara = (Chara)charas.get(i);
+            //  キャラクターの移動タイプを調べる
+            if(chara.getMoveType() == 0){     // 移動するタイプなら
+                if(chara.isMoving()) {    // スクロール中なら
+                    chara.move();         // 移動する
+                }
+            }else if(rand.nextDouble() < Chara.PROB_MOVE){
+                // 移動しないタイプの場合はChara.PROB_MOVEの確率で移動する
+                // 方向はランダムで決める
+                chara.setDirection(rand.nextInt(4));
+                chara.setMoving(true);
+            }
         }
     }
 
