@@ -15,6 +15,8 @@ public class Rpg extends JFrame{
         Container contentPane = getContentPane();
         contentPane.add(panel);
 
+        setResizable(false);
+
         //　パネルサイズに合わせてフレームサイズを自動設定
         pack();
     }

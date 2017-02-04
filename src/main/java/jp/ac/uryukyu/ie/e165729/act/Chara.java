@@ -62,7 +62,6 @@ public class Chara implements Common {
         px = x * CS;
         py = y * CS;
 
-//        direction = DOWN;
         count = 0;
         switchConut = 0;
 
@@ -294,6 +293,129 @@ public class Chara implements Common {
         return false;
     }
 
+    /**
+     * キャラクターの隣に他のキャラクターがいるか調べる
+     * @return キャラクターがいればそのCharaオブジェクトを返す
+     */
+    public Chara talkWith(){
+        int nextX = 0;
+        int nextY = 0;
+        // キャラクターの向いている方向の一歩先の座標
+        switch(direction){
+            case DOWN:
+                nextX = x;
+                nextY = y + 1;
+                break;
+
+            case LEFT:
+                nextX = x - 1;
+                nextY = y;
+                break;
+
+            case RIGHT:
+                nextX = x + 1;
+                nextY = y;
+                break;
+
+            case UP:
+                nextX = x;
+                nextY = y - 1;
+                break;
+        }
+        // その方向にキャラクターがいるか調べる
+        Chara chara;
+        chara = map.charaCheck(nextX, nextY);
+        // キャラクターがいれば話しかけたキャラの方向に向ける
+        if(chara != null){
+            switch (direction){
+                case DOWN:
+                    chara.setDirection(UP);
+                    break;
+
+                case LEFT:
+                    chara.setDirection(RIGHT);
+                    break;
+
+                case RIGHT:
+                    chara.setDirection(LEFT);
+                    break;
+
+                case UP:
+                    chara.setDirection(DOWN);
+                    break;
+            }
+        }
+        return chara;
+    }
+
+    /**
+     * あしもとに宝箱があるかを調べる
+     * @return あしもとにあるTreasureEventオブジェクト
+     */
+    public TreasureEvent search(){
+        int nextX = 0;
+        int nextY = 0;
+        // キャラクターの向いている方向の1歩先の座標
+        switch (direction){
+            case DOWN:
+                nextX = x;
+                nextY = y + 1;
+                break;
+            case LEFT:
+                nextX = x - 1;
+                nextY = y;
+                break;
+            case RIGHT:
+                nextX = x + 1;
+                nextY = y;
+                break;
+            case UP:
+                nextX = x;
+                nextY = y - 1;
+                break;
+        }
+        Event event = map.eventCheck(nextX, nextY);
+        if(event instanceof TreasureEvent){
+            return (TreasureEvent)event;
+        }
+        return null;
+    }
+
+    /**
+     * 目の前にドアがあるかを調べる
+     * @return 目の前にあるDoorEventオブジェクト
+     */
+    public DoorEvent open(){
+        int nextX = 0;
+        int nextY = 0;
+        // キャラクターの向いている方向の1歩先の座標
+        switch (direction){
+            case DOWN:
+                nextX = x;
+                nextY = y + 1;
+                break;
+            case LEFT:
+                nextX = x - 1;
+                nextY = y;
+                break;
+            case RIGHT:
+                nextX = x + 1;
+                nextY = y;
+                break;
+            case UP:
+                nextX = x;
+                nextY = y - 1;
+                break;
+        }
+        // その方向にドアがあるかを調べる
+        Event event = map.eventCheck(nextX, nextY);
+        if(event instanceof DoorEvent){
+            return (DoorEvent)event;
+        }
+        return null;
+    }
+
+
     public int getX(){
         return x;
     }
@@ -338,9 +460,9 @@ public class Chara implements Common {
 
     private void loadImage() {
         // ビルド用
-//        ClassLoader cl = this.getClass().getClassLoader();
-//        ImageIcon icon = new ImageIcon(cl.getResource("chara.png"));
-        ImageIcon icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/chara.png").getAbsolutePath());
+        ClassLoader cl = this.getClass().getClassLoader();
+        ImageIcon icon = new ImageIcon(cl.getResource("image/chara.png"));
+//        ImageIcon icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/chara.png").getAbsolutePath());
         charaImage = icon.getImage();
     }
 

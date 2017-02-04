@@ -1,5 +1,7 @@
 package jp.ac.uryukyu.ie.e165729.act;
 
+import org.omg.IOP.ENCODING_CDR_ENCAPS;
+
 import java.awt.Graphics;
 import java.awt.Image;
 import java.io.BufferedReader;
@@ -52,6 +54,8 @@ public class Map implements Common {
 
     // このマップにいるキャラクターたち
     private Vector charas = new Vector();
+    // このマップにあるイベント
+    private Vector events = new Vector();
 
     // メインパネルへの参照
     private MainPanel panel;
@@ -89,6 +93,21 @@ public class Map implements Common {
                 g.drawImage(chipImage, tilesToPixels(j) + offsetX, tilesToPixels(i) + offsetY,
                         tilesToPixels(j) + offsetX + CS, tilesToPixels(i) + offsetY + CS,
                         cx, cy, cx + CS, cy + CS, panel);
+
+                // (j,i)にあるイベントを描写
+                for(int n = 0; n < events.size(); n++){
+                    Event event = (Event)events.get(n);
+                    //  イベントが(j, i)にあれば描写
+                    if(event.x == j && event.y == i){
+                        mapChipNo = event.chipNo;
+                        cx = (mapChipNo % 8) * CS;
+                        cy = (mapChipNo / 8) * CS;
+                        g.drawImage(chipImage, tilesToPixels(j) + offsetX, tilesToPixels(i) + offsetY,
+                                tilesToPixels(j) + offsetX + CS, tilesToPixels(i) + offsetY + CS,
+                                cx, cy, cx + CS, cy + CS, panel);
+                    }
+                }
+
             }
         }
         // このマップにいるキャラクターを描写
@@ -118,6 +137,14 @@ public class Map implements Common {
             }
         }
 
+        // ぶつかるイベントがあるか
+        for(int i = 0; i < events.size(); i++){
+            Event event = (Event)events.get(i);
+            if(event.x == x && event.y == y){
+                return event.isHit;
+            }
+        }
+
         // なければ進む
         return false;
     }
@@ -128,6 +155,46 @@ public class Map implements Common {
      */
     public void addChara(Chara chara){
         charas.add(chara);
+    }
+
+    /**
+     * (x,y)にキャラがいるか調べる
+     * @param x X座標
+     * @param y Y座標
+     * @return (x,y)にいるキャラ，いなければnull
+     */
+    public Chara charaCheck(int x, int y){
+        for(int i = 0; i < charas.size(); i++){
+            Chara chara = (Chara)charas.get(i);
+            if(chara.getX() == x && chara.getY() == y){
+                return chara;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * (x,y)にイベントがあるかを調べる
+     * @param x x座標
+     * @param y y座標
+     * @return イベント
+     */
+    public Event eventCheck(int x, int y){
+        for(int i = 0;i < events.size(); i++){
+            Event event = (Event)events.get(i);
+            if(event.x == x && event.y == y){
+                return event;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 登録されたイベントを削除
+     * @param event 削除したいイベント
+     */
+    public void removeEvent(Event event){
+        events.remove(event);
     }
 
     /**
@@ -175,12 +242,12 @@ public class Map implements Common {
     private void load(String filename){
         try {
 //            ビルド用
-//            ClassLoader cls = this.getClass().getClassLoader();
-//            BufferedReader br = new BufferedReader(new InputStreamReader(cls.getResourceAsStream(filename)));
+            ClassLoader cls = this.getClass().getClassLoader();
+            BufferedReader br = new BufferedReader(new InputStreamReader(cls.getResourceAsStream(filename)));
 
-            FileInputStream fs = new FileInputStream( new File(filename).getAbsolutePath());
-            InputStreamReader in = new InputStreamReader(fs);
-            BufferedReader br = new BufferedReader(in);
+//            FileInputStream fs = new FileInputStream( new File(filename).getAbsolutePath());
+//            InputStreamReader in = new InputStreamReader(fs);
+//            BufferedReader br = new BufferedReader(in);
 
             // rowを読み込む
             String line = br.readLine();
@@ -212,25 +279,29 @@ public class Map implements Common {
     private void loadEvent(String eventFile){
         try{
             // ビルド用
-//            ClassLoader cs = this.getClass().getClassLoader();
-//            BufferedReader br = new BufferedReader(new InputStreamReader(cs.getResourceAsStream(eventFile), "Shift_JIS"));
+            ClassLoader cs = this.getClass().getClassLoader();
+            BufferedReader br = new BufferedReader(new InputStreamReader(cs.getResourceAsStream(eventFile)));
 
-            FileInputStream fs = new FileInputStream( new File(eventFile).getAbsolutePath());
-            InputStreamReader in = new InputStreamReader(fs);
-            BufferedReader br = new BufferedReader(in);
+//            FileInputStream fs = new FileInputStream( new File(eventFile).getAbsolutePath());
+//            InputStreamReader in = new InputStreamReader(fs);
+//            BufferedReader br = new BufferedReader(in);
 
             String line;
             while ((line = br.readLine()) != null){
                 // 空行は読み飛ばす
                 if(line.equals("")) continue;
                 // コメント行は読み飛ばす
-                if(line.equals("#")) continue;
+                if(line.startsWith("#")) continue;
                 StringTokenizer st = new StringTokenizer(line, ",");
                 // イベント情報を取得する
                 // イベントタイプを取得してイベントごとに処理をする
                 String eventType = st.nextToken();
                 if(eventType.equals("CHARA")){      // キャラクターイベント
                     makeCharacter(st);
+                }else if(eventType.equals("TREASURE")){  // 宝箱イベント
+                    makeTreasure(st);
+                }else if(eventType.equals("DOOR")){      // 扉イベント
+                    makeDoor(st);
                 }
             }
 
@@ -244,9 +315,9 @@ public class Map implements Common {
      */
     private void loadImage(){
         // ビルド用
-//        ClassLoader cl = this.getClass().getClassLoader();
-//        ImageIcon icon = new ImageIcon(cl.getResource("image/mapchip.gif"));
-        ImageIcon icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/mapchip.gif").getAbsolutePath());
+        ClassLoader cl = this.getClass().getClassLoader();
+        ImageIcon icon = new ImageIcon(cl.getResource("image/mapchip.gif"));
+//        ImageIcon icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/mapchip.gif").getAbsolutePath());
         chipImage = icon.getImage();
     }
 
@@ -264,13 +335,39 @@ public class Map implements Common {
         // 移動タイプ
         int moveType = Integer.parseInt(st.nextToken());
         // メッセージ
-        String massage = st.nextToken();
+        String message = st.nextToken();
         // キャラクターを作成
         Chara c = new Chara(x, y, charaNo, dir, moveType, this);
         // メッセージを登録
-        c.setMassage(massage);
+        c.setMassage(message);
         // キャラクターベクトルに登録
         charas.add(c);
+    }
+
+    /**
+     * 宝箱イベントを作成
+     */
+    public void makeTreasure(StringTokenizer st){
+        // 宝箱の座標
+        int x = Integer.parseInt(st.nextToken());
+        int y = Integer.parseInt(st.nextToken());
+        // アイテム名
+        String itemName = st.nextToken();
+        // 宝箱イベントの作成
+        TreasureEvent t = new TreasureEvent(x, y, itemName);
+        // 宝箱イベントを登録
+        events.add(t);
+    }
+
+
+    public void makeDoor(StringTokenizer st){
+        // 扉の座標
+        int x = Integer.parseInt(st.nextToken());
+        int y = Integer.parseInt(st.nextToken());
+        // 扉イベントを作成
+        DoorEvent d = new DoorEvent(x, y);
+        // 扉イベントの追加
+        events.add(d);
     }
 
     /**

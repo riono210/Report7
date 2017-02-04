@@ -37,7 +37,7 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
     private Random rand = new Random();
 
     // ウィンドウ
-    private MassageWindow massageWindow;
+    private MessageWindow messageWindow;
     // ウィンドウを表示する領域
     private static Rectangle WND_RECT = new Rectangle(62, 324, 356, 140);
 
@@ -58,7 +58,7 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
 
         // マップを作成
         // ビルド時　   map/map.txt  // src/main/java/jp/ac/uryukyu/ie/e165729/
-        map = new Map("src/main/java/jp/ac/uryukyu/ie/e165729/map/map.txt", "src/main/java/jp/ac/uryukyu/ie/e165729/event/event.txt",this);
+        map = new Map("map/map.txt", "event/event.txt",this);
         // 勇者を作成
         hero = new Chara(4, 4, 0, DOWN, 0,map);
 
@@ -67,7 +67,7 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
         map.addChara(hero);
 
         // ウィンドウを追加
-        massageWindow = new MassageWindow(WND_RECT);
+        messageWindow = new MessageWindow(WND_RECT);
 
         // ゲームループの開始
         gameLoop = new Thread(this);
@@ -93,20 +93,20 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
         map.draw(g, offsetX, offsetY);
 
         // メッセージウィンドウを描写
-        massageWindow.draw(g);
+        messageWindow.draw(g);
 
     }
 
     public void run(){
         while (true) {
             // キー入力をチェックする
-            if (massageWindow.isVisible()) {   // メッセージウィンドウ表示中
+            if (messageWindow.isVisible()) {   // メッセージウィンドウ表示中
                 massageWindowChackInput();
             } else {
                 mainWindowCheckInput();
             }
 
-            if(!massageWindow.isVisible()){
+            if(!messageWindow.isVisible()){
                 // 勇者の移動処理
                 heroMove();
                 // その他のキャラクターの移動処理
@@ -156,19 +156,56 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
         if(spaceKey.isPressed()){
             // 移動中は表示できない
             if(hero.isMoving()) return;
-            if(!massageWindow.isVisible()){
+            // 宝箱
+            if(treasureCheck()) return;
+            // 扉
+            if(doorCheck()) return;
+            // 話す
+            if(!messageWindow.isVisible()){
                 Chara chara = hero.talkWith();
                 if(chara != null){
                     // メッセージをセットする
-                    massageWindow.setMassage(chara.getMassage());
+                    messageWindow.setMassage(chara.getMassage());
                     // メッセージウィンドウを表示する
-                    massageWindow.show();
+                    messageWindow.show();
                 }else {
-                    massageWindow.setMassage("ゆうしゃは　あしもとをしらべた！\\fしかし　なにもみつからなかった！");
-                    massageWindow.show();
+                    messageWindow.setMassage("ゆうしゃは　あしもとをしらべた！\\fしかし　なにもみつからなかった！");
+                    messageWindow.show();
                 }
             }
         }
+    }
+
+    /**
+     * 宝箱を開ける処理
+     * @return 宝箱を開けたらtrue,そもそも宝箱がなかったらfalse
+     */
+    public boolean treasureCheck(){
+        TreasureEvent treasure = hero.search();
+        if(treasure != null){
+            // メッセージをセットする
+            messageWindow.setMassage(treasure.getItemName() + "を　てにいれた！");
+            // メッセージウィンドウを表示
+            messageWindow.show();
+            // ここにアイテム入手処理を入れる?
+            // 宝箱を削除
+            map.removeEvent(treasure);
+            return true;  // しらべた場合は話さない
+        }
+        return false;
+    }
+
+    /**
+     * ドアを開ける処理
+     * @return ドアを開けたらtrue，そもそもドアがなかったらfalse
+     */
+    public boolean doorCheck(){
+        DoorEvent door = hero.open();
+        if(door != null){
+            map.removeEvent(door);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -176,8 +213,8 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
      */
     private void massageWindowChackInput(){
         if(spaceKey.isPressed()){
-            if(massageWindow.nextMassage()) {
-                massageWindow.hide();
+            if(messageWindow.nextMassage()) {
+                messageWindow.hide();
             }
         }
     }
@@ -190,8 +227,6 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
             }
         }
     }
-
-
 
     /**
      * 勇者以外の移動
@@ -214,7 +249,6 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
             }
         }
     }
-
 
     /**
      * キーが押されたらキーの状態を「押された」にする
