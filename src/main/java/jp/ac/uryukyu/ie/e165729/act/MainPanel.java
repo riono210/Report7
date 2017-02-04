@@ -157,7 +157,16 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
             // 移動中は表示できない
             if(hero.isMoving()) return;
             if(!massageWindow.isVisible()){
-                massageWindow.show();
+                Chara chara = hero.talkWith();
+                if(chara != null){
+                    // メッセージをセットする
+                    massageWindow.setMassage(chara.getMassage());
+                    // メッセージウィンドウを表示する
+                    massageWindow.show();
+                }else {
+                    massageWindow.setMassage("ゆうしゃは　あしもとをしらべた！\\fしかし　なにもみつからなかった！");
+                    massageWindow.show();
+                }
             }
         }
     }
@@ -167,7 +176,9 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
      */
     private void massageWindowChackInput(){
         if(spaceKey.isPressed()){
-            massageWindow.hide();
+            if(massageWindow.nextMassage()) {
+                massageWindow.hide();
+            }
         }
     }
 
