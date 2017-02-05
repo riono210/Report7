@@ -1,4 +1,6 @@
-package jp.ac.uryukyu.ie.e165729.act;
+package jp.ac.uryukyu.ie.e165729.evt;
+
+import jp.ac.uryukyu.ie.e165729.act.Event;
 
 /**
  * Created by e165729 on 2017/02/04.

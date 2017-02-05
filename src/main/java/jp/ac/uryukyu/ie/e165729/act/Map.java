@@ -1,12 +1,12 @@
 package jp.ac.uryukyu.ie.e165729.act;
 
-import org.omg.IOP.ENCODING_CDR_ENCAPS;
+import jp.ac.uryukyu.ie.e165729.evt.DoorEvent;
+import jp.ac.uryukyu.ie.e165729.evt.MoveEvent;
+import jp.ac.uryukyu.ie.e165729.evt.TreasureEvent;
 
 import java.awt.Graphics;
 import java.awt.Image;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.File;
 import java.io.InputStreamReader;
 import java.util.Vector;
 import java.util.StringTokenizer;
@@ -18,7 +18,7 @@ import javax.swing.ImageIcon;
  */
 public class Map implements Common {
     // マップ
-    private int[][] map ={
+    private int[][] map ={      // デバッグ用デモマップ。ファイルの読み込みができない場合に出現する
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
@@ -60,9 +60,14 @@ public class Map implements Common {
     // メインパネルへの参照
     private MainPanel panel;
 
-    public Map(String filename, String eventFile, MainPanel panel){
+    // BGM番号
+    private int bgmNo;
+
+    public Map(String  mapFile, String eventFile, int bgmNo, MainPanel panel){
+        this.bgmNo = bgmNo;
+
         // マップをロード
-        load(filename);
+        load(mapFile);
 
         // イベントをロード
         loadEvent(eventFile);
@@ -124,8 +129,8 @@ public class Map implements Common {
      * @return (x,y)にぶつかるものがあったらtrueを返す
      */
     public boolean isHit(int x, int y){
-        // (x,y)に壁か王座があったらぶつかる
-        if(map[y][x] == 1 || map[y][x] == 2){
+        // (x,y)に壁，王座，海，カウンターがあったらぶつかる
+        if(map[y][x] == 1 || map[y][x] == 2 || map[x][y] == 5 || map[x][y] == 19){
             return true;
         }
 
@@ -157,6 +162,13 @@ public class Map implements Common {
         charas.add(chara);
     }
 
+    /**
+     * キャラクターをこのマップから削除する
+     * @param chara キャラクター
+     */
+    public void removeChara(Chara chara){
+        charas.remove(chara);
+    }
     /**
      * (x,y)にキャラがいるか調べる
      * @param x X座標
@@ -302,9 +314,10 @@ public class Map implements Common {
                     makeTreasure(st);
                 }else if(eventType.equals("DOOR")){      // 扉イベント
                     makeDoor(st);
+                }else if(eventType.equals("MOVE")){      // 移動イベント
+                    makeMove(st);
                 }
             }
-
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -359,7 +372,9 @@ public class Map implements Common {
         events.add(t);
     }
 
-
+    /**
+     * ドアイベントを作成
+     */
     public void makeDoor(StringTokenizer st){
         // 扉の座標
         int x = Integer.parseInt(st.nextToken());
@@ -368,6 +383,34 @@ public class Map implements Common {
         DoorEvent d = new DoorEvent(x, y);
         // 扉イベントの追加
         events.add(d);
+    }
+
+    /**
+     * 移動イベントを作成
+     */
+    public void makeMove(StringTokenizer st){
+        // 移動イベントの座標
+        int x = Integer.parseInt(st.nextToken());
+        int y = Integer.parseInt(st.nextToken());
+        // チップ番号
+        int chipNo = Integer.parseInt(st.nextToken());
+        // 移動先のマップ番号
+        int destMapNo = Integer.parseInt(st.nextToken());
+        // 移動先のx,y座標
+        int destX = Integer.parseInt(st.nextToken());
+        int destY = Integer.parseInt(st.nextToken());
+        // 移動イベントを作成
+        MoveEvent m = new MoveEvent(x, y, chipNo, destMapNo, destX, destY);
+        // 移動イベントを登録
+        events.add(m);
+    }
+
+    /**
+     * このマップのBGM番号を返す
+     * @return BGM番号
+     */
+    public int getBgmNo(){
+        return bgmNo;
     }
 
     /**

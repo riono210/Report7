@@ -1,8 +1,10 @@
 package jp.ac.uryukyu.ie.e165729.act;
 
+import jp.ac.uryukyu.ie.e165729.evt.DoorEvent;
+import jp.ac.uryukyu.ie.e165729.evt.TreasureEvent;
+
 import java.awt.Graphics;
 import java.awt.Image;
-import java.io.File;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
@@ -349,7 +351,7 @@ public class Chara implements Common {
     }
 
     /**
-     * あしもとに宝箱があるかを調べる
+     * 目の前に宝箱があるかを調べる
      * @return あしもとにあるTreasureEventオブジェクト
      */
     public TreasureEvent search(){

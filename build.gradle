@@ -17,8 +17,8 @@ jar {
         attributes  "Main-Class": "jp.ac.uryukyu.ie.e165729.act.Rpg"
         attributes 'Implementation-Title': 'Gradle Quickstart', 'Implementation-Version': version
     }
-    from('src/main/java/jp/ac/uryukyu/ie/e165729') {
-        include 'image/*','map/*', 'event/event.txt'
+    from('src/resources') {
+        include 'image/*','map/*', 'event/*' , 'bgm/*'
     }
 }
 
