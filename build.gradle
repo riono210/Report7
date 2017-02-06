@@ -14,7 +14,7 @@ dependencies {
 }
 jar {
     manifest {
-        attributes  "Main-Class": "jp.ac.uryukyu.ie.e165729.act.Rpg"
+        attributes  "Main-Class": "jp.ac.uryukyu.ie.e165729.act.Main"
         attributes 'Implementation-Title': 'Gradle Quickstart', 'Implementation-Version': version
     }
     from('src/resources') {

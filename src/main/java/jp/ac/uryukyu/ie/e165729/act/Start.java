@@ -28,11 +28,13 @@ public class Start extends JFrame implements KeyListener {
         p.setLayout(null);
         first = true;
 
+        // 開始イメージをロード
         ClassLoader clas = this.getClass().getClassLoader();
         ImageIcon icon = new ImageIcon(clas.getResource("image/start.jpg"));
         label1 = new JLabel(icon);
         label1.setBounds(0, 0, 640, 480);
 
+        // Press any keyを追加
         label2 = new JLabel("Press any key");
         label2.setOpaque(true);
         label2.setBounds(220, 380, 231, 60);                    // 座標と大きさ
@@ -40,10 +42,11 @@ public class Start extends JFrame implements KeyListener {
         label2.setBackground(new Color(250, 250, 250, 100));    // 背景の色
         label2.setFont(new Font("Arial", Font.PLAIN, 35));      // フォントと文字の大きさ
 
-        label3 =new JLabel ("RPGツクール");
+        // タイトルを追加
+        label3 =new JLabel ("RPGツクーレール");
         label3.setOpaque(true);
         label3.setBackground(new Color(250, 250, 250, 200));
-        label3.setBounds(180, 30, 310, 60);
+        label3.setBounds(130, 30, 400, 60);
         label3.setForeground(new Color(240, 120, 50, 255));
         label3.setFont(new Font("游ゴシック体", Font.PLAIN, 50));
 
