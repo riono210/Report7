@@ -61,10 +61,10 @@ public class Map implements Common {
     private MainPanel panel;
 
     // BGM番号
-    private int bgmNo;
+    private String bgmName;
 
-    public Map(String  mapFile, String eventFile, int bgmNo, MainPanel panel){
-        this.bgmNo = bgmNo;
+    public Map(String  mapFile, String eventFile, String bgmName, MainPanel panel){
+        this.bgmName = bgmName;
 
         // マップをロード
         load(mapFile);
@@ -409,8 +409,8 @@ public class Map implements Common {
      * このマップのBGM番号を返す
      * @return BGM番号
      */
-    public int getBgmNo(){
-        return bgmNo;
+    public String getBgmName(){
+        return bgmName;
     }
 
     /**

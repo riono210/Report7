@@ -1,11 +1,10 @@
 package jp.ac.uryukyu.ie.e165729.act;
 
-
 import java.awt.*;
 import java.awt.Image;
-import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
+
 
 import javax.swing.ImageIcon;
 /**

@@ -18,7 +18,7 @@ jar {
         attributes 'Implementation-Title': 'Gradle Quickstart', 'Implementation-Version': version
     }
     from('src/resources') {
-        include 'image/*','map/*', 'event/*' , 'bgm/*'
+        include 'image/*','map/*', 'event/*' , 'bgm/*', 'sound/*'
     }
 }
 

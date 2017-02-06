@@ -6,9 +6,6 @@ import java.io.IOException;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 
-/**
- * Created by e165729 on 2017/02/05.
- */
 public class DataClip {
     // WAVEファイルからロードしたサウンドデータ
     public byte[] data;

@@ -2,17 +2,15 @@ package jp.ac.uryukyu.ie.e165729.act;
 
 import jp.ac.uryukyu.ie.e165729.evt.*;
 import jp.ac.uryukyu.ie.e165729.sound.MidiEngine;
+import jp.ac.uryukyu.ie.e165729.sound.WaveEngine;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.Rectangle;
-import java.io.IOException;
 import java.util.Random;
 import java.util.Vector;
 
-import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.MidiUnavailableException;
 import javax.swing.JPanel;
 
 
@@ -50,10 +48,20 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
     // ウィンドウを表示する領域
     private static Rectangle WND_RECT = new Rectangle(62, 324, 356, 140);
 
-    // BGM名
-    private static final String[] bgmNames = {"tamhe07.mid", "tamsu02.mid"};
+    // サウンドエンジン
+    private MidiEngine midiEngine = new MidiEngine();
+    private   static WaveEngine waveEngine = new WaveEngine();
 
+    // BGM名（from TAM Music Factory: http://www.tam-music.com/）
+    private static final String[] bgmNames = {"castle", "field"};
+    private static final String[] bgmFiles = {"bgm/castle.mid", "bgm/field.mid"};
+
+    // サウンド名
+    private static final String[] soundNames = {"treasure", "door", "step", "talk"};
+
+    private final String[] soundFiles = {"sound/treasure.wav", "sound/door.wav", "sound/step.wav", "sound/tm2_hit004.wav"};
     public MainPanel(){
+        super();
         // パネルの推奨サイズの設定
         setPreferredSize(new Dimension(WIDTH,HEIGHT));
 
@@ -72,9 +80,9 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
         maps = new Map[2];
         // 王の間
         // ビルド時　     // src/main/java/jp/ac/uryukyu/ie/e165729/
-        maps[0] = new Map("map/kingRoomMap.txt", "event/kingRoomEvt.txt", 0, this);
+        maps[0] = new Map("map/kingRoomMap.txt", "event/kingRoomEvt.txt", "castle", this);
         // フィールド
-        maps[1] = new Map("map/fieldMap.txt", "event/fieldEvt.txt", 1, this);
+        maps[1] = new Map("map/fieldMap.txt", "event/fieldEvt.txt", "field", this);
 
         // 最初は王の間
         mapNo = 0;
@@ -93,7 +101,7 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
         loadSound();
 
         // マップに割り当てられたBGMを再生
-        MidiEngine.play(maps[mapNo].getBgmNo());
+        midiEngine.play(maps[mapNo].getBgmName());
 
         // ゲームループの開始
         gameLoop = new Thread(this);
@@ -189,6 +197,7 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
             // 話す
             if(!messageWindow.isVisible()){
                 Chara chara = hero.talkWith();
+                waveEngine.play("talk");
                 if(chara != null){
                     // メッセージをセットする
                     messageWindow.setMassage(chara.getMassage());
@@ -196,6 +205,7 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
                     messageWindow.show();
                 }else {
                     messageWindow.setMassage("ゆうしゃは　あしもとをしらべた！\\fしかし　なにもみつからなかった！");
+
                     messageWindow.show();
                 }
             }
@@ -209,6 +219,8 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
     public boolean treasureCheck(){
         TreasureEvent treasure = hero.search();
         if(treasure != null){
+            // かちゃ
+            waveEngine.play("treasure");
             // メッセージをセットする
             messageWindow.setMassage(treasure.getItemName() + "を　てにいれた！");
             // メッセージウィンドウを表示
@@ -228,6 +240,8 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
     public boolean doorCheck(){
         DoorEvent door = hero.open();
         if(door != null){
+            // ギー
+            waveEngine.play("door");
             maps[mapNo].removeEvent(door);
             return true;
         }
@@ -256,6 +270,8 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
                 Event event = maps[mapNo].eventCheck(hero.getX(), hero.getY());
                 if(event instanceof MoveEvent){   // 移動イベントなら
                     MoveEvent m = (MoveEvent)event;
+                    // ザッザッザッ
+                    waveEngine.play("step");
                     // 移動元の勇者を削除
                     maps[mapNo].removeChara(hero);
                     // 現在のマップ番号に移動先のマップ番号をセット
@@ -265,11 +281,10 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
                     // 移動先マップに勇者を登録
                     maps[mapNo].addChara(hero);
                     // 移動先マップのBGMを再生
-                    MidiEngine.play(maps[mapNo].getBgmNo());
+                    midiEngine.play(maps[mapNo].getBgmName());
                 }
 
             }
-
         }
     }
 
@@ -301,6 +316,8 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
      * @param e キーイベント
      */
     public void keyPressed(KeyEvent e){
+
+
         // 押されたキーを取得
         int keyCode = e.getKeyCode();
 
@@ -349,18 +366,18 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
     public void keyTyped(KeyEvent e){
     }
 
+    /**
+     * サウンドをロードする
+     */
     private void loadSound() {
+        // サウンドをロード
+        for (int i = 0; i < soundNames.length; i++) {
+            waveEngine.load(soundNames[i], soundFiles[i]);
+        }
         // BGMをロード
-        for (int i=0; i<bgmNames.length; i++) {
-            try {
-                MidiEngine.load("bgm/" + bgmNames[i]);
-            } catch (MidiUnavailableException e) {
-                e.printStackTrace();
-            } catch (InvalidMidiDataException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        for (int i = 0; i < bgmNames.length; i++) {
+            midiEngine.load(bgmNames[i], bgmFiles[i]);
         }
     }
 }
+

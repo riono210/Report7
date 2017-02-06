@@ -7,8 +7,8 @@ import javax.swing.JFrame;
 /**
  * Created by e165729 on 2017/01/28.
  */
-public class Rpg extends JFrame{
-    public Rpg(){
+public class Rpg extends JFrame {
+    public Rpg() {
         setTitle("イベント");
 
         MainPanel panel = new MainPanel();
@@ -19,11 +19,5 @@ public class Rpg extends JFrame{
 
         //　パネルサイズに合わせてフレームサイズを自動設定
         pack();
-    }
-
-    public static void main(String[] args){
-        Rpg frame = new Rpg();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
     }
 }
