@@ -11,7 +11,7 @@ public class Main extends JFrame{
         Start start = new Start("タイトル");
         start.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         start.setVisible(true);
-        //start.setResizable(false);
+        start.setResizable(false);
 
         while (start.isFirst()){
             System.out.println("待機中");

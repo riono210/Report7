@@ -463,8 +463,8 @@ public class Chara implements Common {
     private void loadImage() {
         // ビルド用
         ClassLoader cl = this.getClass().getClassLoader();
-        ImageIcon icon = new ImageIcon(cl.getResource("image/chara.png"));
-//        ImageIcon icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/chara.png").getAbsolutePath());
+        ImageIcon icon = new ImageIcon(cl.getResource("image/charaimage.png"));
+//        ImageIcon icon = new ImageIcon(new File("src/main/java/jp/ac/uryukyu/ie/e165729/image/charaimage.png").getAbsolutePath());
         charaImage = icon.getImage();
     }
 

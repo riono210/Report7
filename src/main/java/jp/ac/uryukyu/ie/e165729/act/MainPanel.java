@@ -19,7 +19,7 @@ import javax.swing.JPanel;
  */
 public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
     // ウィンドウの大きさ
-    public static final int WIDTH = 480;
+    public static final int WIDTH = 640;
     public static final int HEIGHT = 480;
 
     // マップ
@@ -77,12 +77,16 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
         spaceKey = new ActionKey(ActionKey.DETECT_INITIAL_PRESS_ONLY);
 
         // マップを作成
-        maps = new Map[2];
+        maps = new Map[4];
         // 王の間
         // ビルド時　     // src/main/java/jp/ac/uryukyu/ie/e165729/
         maps[0] = new Map("map/kingRoomMap.txt", "event/kingRoomEvt.txt", "castle", this);
         // フィールド
         maps[1] = new Map("map/fieldMap.txt", "event/fieldEvt.txt", "field", this);
+        // 村
+        maps[2] = new Map("map/villageMap.txt", "event/villageEvt.txt", "castle", this);
+        // 洞窟
+        maps[3] = new Map("map/caveMap.txt","event/caveEvt.txt", "field" ,this);
 
         // 最初は王の間
         mapNo = 0;
@@ -187,23 +191,24 @@ public class MainPanel extends JPanel implements KeyListener, Runnable, Common{
                 hero.setMoving(true);
             }
         }
-        if(spaceKey.isPressed()){
+        if(spaceKey.isPressed()) {
             // 移動中は表示できない
-            if(hero.isMoving()) return;
+            if (hero.isMoving()) return;
             // 宝箱
-            if(treasureCheck()) return;
+            if (treasureCheck()) return;
             // 扉
-            if(doorCheck()) return;
+            if (doorCheck()) return;
             // 話す
-            if(!messageWindow.isVisible()){
+            if (!messageWindow.isVisible()) {
                 Chara chara = hero.talkWith();
                 waveEngine.play("talk");
-                if(chara != null){
+                if (chara != null) {
                     // メッセージをセットする
                     messageWindow.setMassage(chara.getMassage());
                     // メッセージウィンドウを表示する
                     messageWindow.show();
-                }else {
+
+                } else {
                     messageWindow.setMassage("ゆうしゃは　あしもとをしらべた！\\fしかし　なにもみつからなかった！");
 
                     messageWindow.show();
